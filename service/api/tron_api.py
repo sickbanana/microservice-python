@@ -1,29 +1,33 @@
-from typing import Dict
-from tronpy import Tron
-from tronpy.keys import PrivateKey
-from fastapi import APIRouter, HTTPException
-from tronpy.providers import HTTPProvider
+from typing import Dict, Annotated
+from fastapi import APIRouter, HTTPException, Depends, Body, Query
+from sqlalchemy import insert, select, update, delete
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from database.connection import get_db
+from database.models import AddressRequest
+from schemas.models import Address, Account
+from tron import get_tron_account_info
 
 tron = APIRouter()
 
 
-def get_tron_account_info(address: str):
-    provider = HTTPProvider(api_key=bytes.fromhex("8888888888888888888888888888888888888888888888888888888888888888"))
-    client = Tron(provider=provider)
-
-    try:
-        account = client.get_account(address)
-        balance_trx = account["balance"]
-        bandwidth = account.get("net_usage", 0)
-        energy = account.get("account_resource", {}).get("energy_usage", 0)
-        response = account
-        return response
-
-    except Exception as e:
-        print(f"Ошибка: {e}")
+@tron.post("/", status_code=200)
+async def address_info(address: Address, session: AsyncSession = Depends(get_db)):
+    account = get_tron_account_info(address.address)
+    async with session.begin():
+        await session.execute(insert(AddressRequest).values(address=address.address))
+    return account
 
 
-@tron.post("/", response_model=Dict, status_code=200)
-async def address_info(address: str):
-    print(address)
-    return get_tron_account_info(address)
+@tron.get("/", status_code=200)
+async def get_requests_history(page: int = Query(1), per_page: int = Query(10, ge=1), session: AsyncSession = Depends(get_db)):
+    result = await session.execute(
+        select(
+            AddressRequest.address,
+            AddressRequest.created_at
+        )
+        .offset((page - 1) * per_page)
+        .limit(per_page)
+    )
+    result = [dict(row) for row in result.mappings()]
+    return result

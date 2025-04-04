@@ -1,0 +1,9 @@
+import os
+
+POSTGRES_PASSWORD = os.environ.get('POSTGRES_PASSWORD')
+
+POSTGRES_HOST = os.environ.get('POSTGRES_HOST')
+
+API_KEY = os.environ.get('API_KEY', bytes.fromhex("8888888888888888888888888888888888888888888888888888888888888888"))
+
+connection = f"postgresql://postgres:{POSTGRES_PASSWORD}@{POSTGRES_HOST}/postgres"
