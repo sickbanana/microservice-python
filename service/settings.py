@@ -1,9 +1,19 @@
 import os
 
+POSTGRES_USER = os.environ.get('POSTGRES_USER')
+
 POSTGRES_PASSWORD = os.environ.get('POSTGRES_PASSWORD')
 
 POSTGRES_HOST = os.environ.get('POSTGRES_HOST')
 
+DEV_BD = os.environ.get('DEV_BD')
+
+TEST_DB = os.environ.get('TEST_BD')
+
 API_KEY = os.environ.get('API_KEY', bytes.fromhex("8888888888888888888888888888888888888888888888888888888888888888"))
 
-connection = f"postgresql://postgres:{POSTGRES_PASSWORD}@{POSTGRES_HOST}/postgres"
+CONNECTION = f"postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}/{DEV_BD}"
+
+DEV_CONNECTION = f"postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}/{DEV_BD}"
+
+TEST_CONNECTION = f"postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}/{TEST_DB}"

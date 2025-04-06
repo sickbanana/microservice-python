@@ -1,8 +1,8 @@
 from tronpy import Tron
 from tronpy.providers import HTTPProvider
 
-from schemas.models import Account
-from settings import API_KEY
+from .schemas.models import Account
+from .settings import API_KEY
 
 
 provider = HTTPProvider(api_key=API_KEY)

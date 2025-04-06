@@ -1,11 +1,11 @@
-FROM python:3.8
+FROM python:3.11.7-alpine
 
-WORKDIR /app
+WORKDIR /src
 
-COPY ./ /app
+COPY ./ /src/app
 
-RUN pip3 install -r requirements.txt
+RUN pip3 install -r app/requirements.txt
 
 EXPOSE 8000
 
-CMD ["python", "main.py"]
+CMD ["python", "-m", "app.main"]

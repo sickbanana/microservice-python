@@ -1,0 +1,29 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - DB1=dev
+      - DB2=test
+    ports:
+      - 5432:5432
+    volumes:
+      - ./bd/init-database.sh:/docker-entrypoint-initdb.d/init-database.sh
+
+  backend:
+    build:
+      context: ./service
+      dockerfile: Dockerfile
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_HOST=postgres
+      - DEV_BD=dev
+      - TEST_BD=test
+    ports:
+      - 8000:8000
+    depends_on:
+      - postgres
+    volumes:
+      - ./service:/src/app
